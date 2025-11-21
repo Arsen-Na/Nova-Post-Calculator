@@ -47,39 +47,37 @@
     .muted { color: #666; font-size: 14px; }
     .note { margin-top: 8px; color: #444; }
 
-    /* Кастомний селектор країни у стилі vue-select */
-    .vs__selected-options {
+    /* Кастомний селектор країни: без прапорів, без дублювань */
+    .country-select {
       display: flex; align-items: center; gap: 8px;
       border: 1px solid #dcdde1; border-radius: 6px;
-      padding: 6px 8px; background: #fff;
-      min-height: 40px;
+      padding: 6px 8px; background: #fff; min-height: 40px;
     }
-    .vs__selected .flex { display: inline-flex; align-items: center; gap: 6px; }
-    .vs__search {
-      flex: 1; border: none; outline: none; font-size: 16px; min-width: 80px;
+    .country-selected {
+      color: #111; font-size: 16px; white-space: nowrap;
+      max-width: 50%; overflow: hidden; text-overflow: ellipsis;
+    }
+    .country-input {
+      flex: 1; border: none; outline: none; font-size: 16px; min-width: 100px;
       background: transparent;
     }
-    .vs__dropdown {
+    .country-dropdown {
       margin-top: 4px; border: 1px solid #dcdde1; border-radius: 6px;
       background: #fff; max-height: 220px; overflow-y: auto;
       list-style: none; padding: 4px 0;
       box-shadow: 0 6px 24px rgba(20,20,30,0.08);
     }
-    .vs__dropdown li {
-      padding: 8px 10px; cursor: pointer;
-      display: flex; align-items: center; gap: 8px;
+    .country-dropdown li {
+      padding: 8px 10px; cursor: pointer; line-height: 1.4;
     }
-    .vs__dropdown li:hover { background: #f5f7fa; }
-    .flag {
-      width: 20px; height: 14px; border: 1px solid #ddd; border-radius: 2px;
-      background: linear-gradient(#fff,#eee);
-    }
+    .country-dropdown li:hover { background: #f5f7fa; }
 
     @media (max-width: 600px) {
       body { margin: 8px; }
       .card { padding: 12px; }
       h1 { font-size: 18px; }
-      input, .vs__search { font-size: 14px; }
+      input, .country-input { font-size: 14px; }
+      .country-selected { font-size: 14px; max-width: 60%; }
     }
   </style>
 </head>
@@ -107,23 +105,17 @@
     <input id="weight" type="number" inputmode="decimal" pattern="[0-9]*" step="any" min="0" placeholder="2.5">
 
     <label for="country-input">Країна одержувача</label>
-    <div class="vs__selected-options" id="country-wrapper">
-      <span class="vs__selected">
-        <div class="flex items-center leading-[25px] font-inter text-base whitespace-nowrap gap-1">
-          <span class="flag" id="country-flag" title="PL"></span>
-          <span class="text-black inline-block" id="country-display">Polska</span>
-        </div>
-      </span>
+    <div class="country-select" id="country-wrapper">
+      <span class="country-selected" id="country-display">Polska</span>
       <input id="country-input"
-             aria-autocomplete="list"
-             aria-labelledby="vs__combobox"
-             aria-controls="vs__listbox"
              type="search"
              autocomplete="off"
-             class="vs__search"
-             placeholder="Почніть вводити країну…">
+             class="country-input"
+             placeholder="Почніть вводити країну…"
+             aria-autocomplete="list"
+             aria-controls="country-listbox">
     </div>
-    <ul id="vs__listbox" class="vs__dropdown" role="listbox" aria-label="Вибір країни"></ul>
+    <ul id="country-listbox" class="country-dropdown" role="listbox" aria-label="Вибір країни"></ul>
 
     <div class="result" aria-live="polite">
       <div class="note">Формула: <span class="formula">(<span id="f-l">довжина</span> × <span id="f-w">ширина</span> × <span id="f-h">висота</span>) ÷ 4000</span></div>
@@ -144,8 +136,8 @@
 
     const countryInput = document.getElementById('country-input'),
           countryDisplay = document.getElementById('country-display'),
-          countryFlag = document.getElementById('country-flag'),
-          dropdown = document.getElementById('vs__listbox');
+          dropdown = document.getElementById('country-listbox'),
+          wrapper = document.getElementById('country-wrapper');
 
     let ratesMap = {}, aliasMap = {}, countries = [];
     const fallbackRate = {s:100, m:150, over10:300, perKg:8};
@@ -169,14 +161,10 @@
           return acc;
         },{});
 
-        // Префіл Polska, якщо є, інакше перша країна
         const initial = ratesMap['Polska'] ? 'Polska' : (countries[0] || '');
         if (initial) {
-          countryDisplay.textContent = initial;
-          countryInput.value = initial;
-          updateFlag(initial);
+          setCountry(initial);
         }
-
         compute();
       }).catch(err => {
         console.error('Помилка завантаження даних:', err);
@@ -192,8 +180,33 @@
 
       countryInput.addEventListener('input', handleCountryInput);
       countryInput.addEventListener('focus', handleCountryInput);
+
       document.addEventListener('click', (e)=>{
-        if (!e.target.closest('#country-wrapper')) dropdown.innerHTML = '';
+        if (!e.target.closest('#country-wrapper')) closeDropdown();
+      });
+
+      // Навігація клавіатурою
+      countryInput.addEventListener('keydown', (e)=>{
+        const items = Array.from(dropdown.querySelectorAll('li'));
+        if (!items.length) return;
+        const active = dropdown.querySelector('li[aria-selected="true"]');
+        let idx = active ? items.indexOf(active) : -1;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          idx = Math.min(idx + 1, items.length - 1);
+          highlight(items, idx);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          idx = Math.max(idx - 1, 0);
+          highlight(items, idx);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const target = items[idx] || items[0];
+          if (target) chooseCountry(target.textContent);
+        } else if (e.key === 'Escape') {
+          closeDropdown();
+        }
       });
     }
 
@@ -202,9 +215,14 @@
       dropdown.innerHTML = '';
       if (!val) return;
 
-      const results = countries
-        .filter(c=>c.toLowerCase().includes(val))
-        .slice(0, 50);
+      const seen = new Set(); // уникаємо дублювань
+      const results = countries.filter(c=>{
+        const lc = c.toLowerCase();
+        if (!lc.includes(val)) return false;
+        if (seen.has(lc)) return false;
+        seen.add(lc);
+        return true;
+      }).slice(0, 50);
 
       if (!results.length) return;
 
@@ -212,17 +230,29 @@
       results.forEach(c=>{
         const li = document.createElement('li');
         li.setAttribute('role','option');
-        li.innerHTML = `<span class="flag" title="${flagCode(c)}"></span><span>${c}</span>`;
-        li.addEventListener('click', ()=>{
-          countryDisplay.textContent = c;
-          countryInput.value = c;
-          updateFlag(c);
-          dropdown.innerHTML = '';
-          compute();
-        });
+        li.textContent = c;
+        li.addEventListener('click', ()=> chooseCountry(c));
         frag.appendChild(li);
       });
       dropdown.appendChild(frag);
+    }
+
+    function chooseCountry(name){
+      setCountry(name);
+      closeDropdown();
+      compute();
+    }
+
+    function setCountry(name){
+      countryDisplay.textContent = name;
+      countryInput.value = name;
+    }
+
+    function closeDropdown(){ dropdown.innerHTML = ''; }
+    function highlight(items, idx){
+      items.forEach(i=>i.removeAttribute('aria-selected'));
+      items[idx].setAttribute('aria-selected','true');
+      items[idx].scrollIntoView({block:'nearest'});
     }
 
     function resolveCountry(input) {
@@ -233,19 +263,6 @@
       if (exactKey) return exactKey;
       const alias = aliasMap[trimmed.toLowerCase()];
       return alias && ratesMap[alias] ? alias : '';
-    }
-
-    function flagCode(name){
-      // Просте зіставлення для демо: беремо дволітерний код із відомих, інакше ініціали
-      const map = {
-        'Polska':'PL','Niemcy':'DE','Czechy':'CZ','Słowacja':'SK','Ukraina':'UA',
-        'Włochy':'IT','Francja':'FR','Hiszpania':'ES','Wielka Brytania':'GB','Stany Zjednoczone Ameryky':'US'
-      };
-      return map[name] || (name.slice(0,2).toUpperCase());
-    }
-
-    function updateFlag(countryName){
-      countryFlag.title = flagCode(countryName);
     }
 
     function parseNumber(el){ const v = parseFloat(el.value); return Number.isFinite(v) ? v : 0; }
