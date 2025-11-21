@@ -47,37 +47,19 @@
     .muted { color: #666; font-size: 14px; }
     .note { margin-top: 8px; color: #444; }
 
-    /* Кастомний селектор країни: без прапорів, без дублювань */
-    .country-select {
-      display: flex; align-items: center; gap: 8px;
-      border: 1px solid #dcdde1; border-radius: 6px;
-      padding: 6px 8px; background: #fff; min-height: 40px;
-    }
-    .country-selected {
-      color: #111; font-size: 16px; white-space: nowrap;
-      max-width: 50%; overflow: hidden; text-overflow: ellipsis;
-    }
+    /* Поле введення країни (тільки інпут, без відображення/дропдауну) */
     .country-input {
-      flex: 1; border: none; outline: none; font-size: 16px; min-width: 100px;
-      background: transparent;
+      width: 100%; box-sizing: border-box;
+      padding: 8px 10px; margin-top: 6px;
+      font-size: 16px; border: 1px solid #dcdde1; border-radius: 6px;
+      background: #fff;
     }
-    .country-dropdown {
-      margin-top: 4px; border: 1px solid #dcdde1; border-radius: 6px;
-      background: #fff; max-height: 220px; overflow-y: auto;
-      list-style: none; padding: 4px 0;
-      box-shadow: 0 6px 24px rgba(20,20,30,0.08);
-    }
-    .country-dropdown li {
-      padding: 8px 10px; cursor: pointer; line-height: 1.4;
-    }
-    .country-dropdown li:hover { background: #f5f7fa; }
 
     @media (max-width: 600px) {
       body { margin: 8px; }
       .card { padding: 12px; }
       h1 { font-size: 18px; }
       input, .country-input { font-size: 14px; }
-      .country-selected { font-size: 14px; max-width: 60%; }
     }
   </style>
 </head>
@@ -105,17 +87,11 @@
     <input id="weight" type="number" inputmode="decimal" pattern="[0-9]*" step="any" min="0" placeholder="2.5">
 
     <label for="country-input">Країна одержувача</label>
-    <div class="country-select" id="country-wrapper">
-      <span class="country-selected" id="country-display">Polska</span>
-      <input id="country-input"
-             type="search"
-             autocomplete="off"
-             class="country-input"
-             placeholder="Почніть вводити країну…"
-             aria-autocomplete="list"
-             aria-controls="country-listbox">
-    </div>
-    <ul id="country-listbox" class="country-dropdown" role="listbox" aria-label="Вибір країни"></ul>
+    <input id="country-input"
+           type="search"
+           autocomplete="off"
+           class="country-input"
+           placeholder="Почніть вводити країну…">
 
     <div class="result" aria-live="polite">
       <div class="note">Формула: <span class="formula">(<span id="f-l">довжина</span> × <span id="f-w">ширина</span> × <span id="f-h">висота</span>) ÷ 4000</span></div>
@@ -132,12 +108,8 @@
           weightEl = document.getElementById('weight'),
           volumetricEl = document.getElementById('volumetric'),
           billableEl = document.getElementById('billable'),
-          priceEl = document.getElementById('price');
-
-    const countryInput = document.getElementById('country-input'),
-          countryDisplay = document.getElementById('country-display'),
-          dropdown = document.getElementById('country-listbox'),
-          wrapper = document.getElementById('country-wrapper');
+          priceEl = document.getElementById('price'),
+          countryInput = document.getElementById('country-input');
 
     let ratesMap = {}, aliasMap = {}, countries = [];
     const fallbackRate = {s:100, m:150, over10:300, perKg:8};
@@ -162,97 +134,19 @@
         },{});
 
         const initial = ratesMap['Polska'] ? 'Polska' : (countries[0] || '');
-        if (initial) {
-          setCountry(initial);
-        }
+        if (initial) countryInput.value = initial;
+
         compute();
       }).catch(err => {
         console.error('Помилка завантаження даних:', err);
-        dropdown.innerHTML = '<li style="color:#a00; padding:8px 10px;">Не вдалося завантажити країни</li>';
         compute();
       });
     }
 
     function bindEvents(){
-      [lengthEl,widthEl,heightEl,weightEl].forEach(el=>{
+      [lengthEl,widthEl,heightEl,weightEl,countryInput].forEach(el=>{
         el.addEventListener('input', ()=>{ updateFormulaFields(); compute(); });
       });
-
-      countryInput.addEventListener('input', handleCountryInput);
-      countryInput.addEventListener('focus', handleCountryInput);
-
-      document.addEventListener('click', (e)=>{
-        if (!e.target.closest('#country-wrapper')) closeDropdown();
-      });
-
-      // Навігація клавіатурою
-      countryInput.addEventListener('keydown', (e)=>{
-        const items = Array.from(dropdown.querySelectorAll('li'));
-        if (!items.length) return;
-        const active = dropdown.querySelector('li[aria-selected="true"]');
-        let idx = active ? items.indexOf(active) : -1;
-
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          idx = Math.min(idx + 1, items.length - 1);
-          highlight(items, idx);
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          idx = Math.max(idx - 1, 0);
-          highlight(items, idx);
-        } else if (e.key === 'Enter') {
-          e.preventDefault();
-          const target = items[idx] || items[0];
-          if (target) chooseCountry(target.textContent);
-        } else if (e.key === 'Escape') {
-          closeDropdown();
-        }
-      });
-    }
-
-    function handleCountryInput(){
-      const val = countryInput.value.trim().toLowerCase();
-      dropdown.innerHTML = '';
-      if (!val) return;
-
-      const seen = new Set(); // уникаємо дублювань
-      const results = countries.filter(c=>{
-        const lc = c.toLowerCase();
-        if (!lc.includes(val)) return false;
-        if (seen.has(lc)) return false;
-        seen.add(lc);
-        return true;
-      }).slice(0, 50);
-
-      if (!results.length) return;
-
-      const frag = document.createDocumentFragment();
-      results.forEach(c=>{
-        const li = document.createElement('li');
-        li.setAttribute('role','option');
-        li.textContent = c;
-        li.addEventListener('click', ()=> chooseCountry(c));
-        frag.appendChild(li);
-      });
-      dropdown.appendChild(frag);
-    }
-
-    function chooseCountry(name){
-      setCountry(name);
-      closeDropdown();
-      compute();
-    }
-
-    function setCountry(name){
-      countryDisplay.textContent = name;
-      countryInput.value = name;
-    }
-
-    function closeDropdown(){ dropdown.innerHTML = ''; }
-    function highlight(items, idx){
-      items.forEach(i=>i.removeAttribute('aria-selected'));
-      items[idx].setAttribute('aria-selected','true');
-      items[idx].scrollIntoView({block:'nearest'});
     }
 
     function resolveCountry(input) {
@@ -276,7 +170,7 @@
       const actual = parseNumber(weightEl), billable = Math.max(vol, actual);
       billableEl.textContent = formatNumber(billable);
 
-      const userInput = countryInput.value || countryDisplay.textContent || '';
+      const userInput = countryInput.value || '';
       const r = ratesMap[resolveCountry(userInput)] || fallbackRate;
       let price = billable<=2 ? r.s : billable<=10 ? r.m : r.over10 + (Math.ceil(billable)-10)*r.perKg;
       const priceText = formatNumber(price);
