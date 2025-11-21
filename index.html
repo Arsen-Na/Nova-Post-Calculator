@@ -72,28 +72,28 @@
     <div class="row">
       <div>
         <label for="length">Довжина (cm)</label>
-        <input id="length" type="number" step="any" min="0" placeholder="40">
+        <input id="length" type="number" inputmode="decimal" pattern="[0-9]*" step="any" min="0" placeholder="40">
       </div>
       <div>
         <label for="width">Ширина (cm)</label>
-        <input id="width" type="number" step="any" min="0" placeholder="30">
+        <input id="width" type="number" inputmode="decimal" pattern="[0-9]*" step="any" min="0" placeholder="30">
       </div>
       <div>
         <label for="height">Висота (cm)</label>
-        <input id="height" type="number" step="any" min="0" placeholder="20">
+        <input id="height" type="number" inputmode="decimal" pattern="[0-9]*" step="any" min="0" placeholder="20">
       </div>
     </div>
 
     <label for="weight">Фактична вага (kg)</label>
-    <input id="weight" type="number" step="any" min="0" placeholder="2.5">
+    <input id="weight" type="number" inputmode="decimal" pattern="[0-9]*" step="any" min="0" placeholder="2.5">
 
     <!-- ПК -->
-    <label for="countryInput">Країна одержувача (ПК)</label>
+    <label for="countryInput">Країна одержувача</label>
     <input id="countryInput" list="countries" placeholder="Polska">
     <datalist id="countries"></datalist>
 
     <!-- Мобільний -->
-    <label for="countrySelect">Країна одержувача (мобільний)</label>
+    <label for="countrySelect">Країна одержувача</label>
     <select id="countrySelect">
       <option value="" disabled selected>Завантаження…</option>
     </select>
@@ -238,3 +238,4 @@
   </script>
 </body>
 </html>
+
