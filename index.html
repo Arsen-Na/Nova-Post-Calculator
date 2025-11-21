@@ -28,26 +28,34 @@
     .muted{color:var(--muted);font-size:14px}
     .note{margin-top:8px;color:#444}
 
-    /* Autocomplete dropdown */
-    .autocomplete{
-      position:relative;
+    /* v-select-like single autocompleter (Dokąd only) */
+    .v-select {
+      position: relative;
+      display: block;
     }
-    .dropdown{
-      position:absolute;left:0;right:0;z-index:60;
-      margin-top:6px;border:1px solid #e0e0e0;background:#fff;border-radius:8px;
-      max-height:240px;overflow:auto;box-shadow:0 8px 30px rgba(20,20,30,0.08);
-      list-style:none;padding:6px 0;margin:0;
+    .vs__dropdown-toggle {
+      display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #dcdde1;border-radius:8px;background:#fff;
+      box-sizing:border-box;
     }
-    .dropdown li{
-      padding:8px 12px;cursor:pointer;line-height:1.3;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    .vs__selected-options { flex:1; display:flex; align-items:center; gap:8px; min-width:0; }
+    .vs__search {
+      flex:1; border:none; outline:none; background:transparent; font-size:16px; min-width:80px;
     }
-    .dropdown li:hover, .dropdown li[aria-selected="true"]{background:#f5f7fa}
-    .dropdown .small{font-size:13px;color:var(--muted);margin-top:4px}
+    .vs__actions { display:flex; align-items:center; gap:8px; }
+    .vs__clear { background:transparent;border:none; cursor:pointer; width:28px; height:28px; }
+    .vs__open-indicator { width:16px; height:16px; opacity:0.7 }
+    .vs__listbox {
+      position:absolute; left:0; right:0; top:100%; z-index:80;
+      margin-top:6px; border:1px solid #e0e0e0; background:#fff; border-radius:8px;
+      max-height:240px; overflow:auto; box-shadow:0 8px 30px rgba(20,20,30,0.08);
+      list-style:none; padding:6px 0; margin:0;
+    }
+    .vs__listbox li { padding:8px 12px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .vs__listbox li:hover, .vs__listbox li[aria-selected="true"] { background:#f5f7fa; }
 
     @media (max-width:600px){
       body{margin:8px}.card{padding:12px}h1{font-size:18px}
-      input, .country-input{font-size:14px}
+      input, .vs__search {font-size:14px}
     }
   </style>
 </head>
@@ -74,11 +82,23 @@
     <label for="weight">Фактична вага (kg)</label>
     <input id="weight" type="number" inputmode="decimal" pattern="[0-9]*" step="any" min="0" placeholder="2.5">
 
-    <label for="country-input">Країна одержувача</label>
-    <div class="autocomplete" aria-haspopup="listbox">
-      <input id="country-input" class="country-input" type="search" autocomplete="off" aria-autocomplete="list"
-             placeholder="Почніть вводити країну…" aria-controls="country-list" aria-expanded="false" />
-      <ul id="country-list" class="dropdown" role="listbox" hidden></ul>
+    <!-- Інтегрований елемент: тільки "Dokąd" (отримувач), без "Skąd" і без прапорців -->
+    <label for="vs2__combobox">Країна одержувача</label>
+    <div id="selectRouteTo" class="v-select" aria-label="Change to">
+      <div id="vs2__combobox" class="vs__dropdown-toggle" role="combobox" aria-haspopup="listbox"
+           aria-expanded="false" aria-owns="vs2__listbox" aria-controls="vs2__listbox" aria-label="Search for option">
+        <div class="vs__selected-options">
+          <input id="vs2__search" class="vs__search" type="search" autocomplete="off" placeholder="Почніть вводити країну…" aria-autocomplete="list" />
+        </div>
+        <div class="vs__actions">
+          <button id="vs2__clear" type="button" title="Clear Selected" aria-label="Clear Selected" class="vs__clear" style="display:none;">✕</button>
+          <svg class="vs__open-indicator" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg" role="presentation">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M14.55 5.99L10.31 10.58L10.29 10.61C10.01 10.92 9.76 11.19 9.54 11.39C9.30 11.60 9.05 11.79 8.73 11.90C8.26 12.06 7.74 12.06 7.27 11.90C6.95 11.79 6.70 11.60 6.46 11.39C6.24 11.19 5.99 10.92 5.71 10.61L5.69 10.58L1.45 5.99L2.55 4.98L6.79 9.57C7.10 9.91 7.31 10.13 7.48 10.28C7.64 10.43 7.72 10.47 7.76 10.48C7.91 10.54 8.09 10.54 8.24 10.48C8.28 10.47 8.36 10.43 8.52 10.28C8.69 10.13 8.90 9.91 9.21 9.57L13.45 4.98L14.55 5.99Z" fill="black"/>
+          </svg>
+        </div>
+      </div>
+
+      <ul id="vs2__listbox" class="vs__listbox" role="listbox" aria-label="Вибір країни" hidden></ul>
     </div>
 
     <div class="result" aria-live="polite">
@@ -95,8 +115,6 @@
           widthEl = document.getElementById('width'),
           heightEl = document.getElementById('height'),
           weightEl = document.getElementById('weight'),
-          countryInput = document.getElementById('country-input'),
-          listEl = document.getElementById('country-list'),
           volumetricEl = document.getElementById('volumetric'),
           billableEl = document.getElementById('billable'),
           priceEl = document.getElementById('price'),
@@ -104,18 +122,21 @@
           fW = document.getElementById('f-w'),
           fH = document.getElementById('f-h');
 
+    const searchInput = document.getElementById('vs2__search'),
+          listbox = document.getElementById('vs2__listbox'),
+          combobox = document.getElementById('vs2__combobox'),
+          clearBtn = document.getElementById('vs2__clear');
+
     // Дані
     let countries = [], ratesMap = {}, aliasMap = {};
     const fallbackRate = {s:100, m:150, over10:300, perKg:8};
 
-    // Налаштування
+    // Параметри автокомплiту
     const MAX_RESULTS = 50;
     const DEBOUNCE_MS = 160;
 
-    // Простий debounce
     function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), ms); }; }
 
-    // Завантаження JSON
     async function loadData(){
       try {
         const [rates, aliases] = await Promise.all([
@@ -125,9 +146,9 @@
         countries = rates.map(r=>r.country);
         rates.forEach(r => ratesMap[r.country] = r);
         aliasMap = Object.keys(aliases).reduce((acc,k)=>{ acc[k.toLowerCase()] = aliases[k]; return acc; }, {});
-        // prefill
+        // pref fill: Polska if present
         const initial = ratesMap['Polska'] ? 'Polska' : (countries[0] || '');
-        if (initial) { countryInput.value = initial; }
+        if (initial) searchInput.value = initial;
       } catch(err){
         console.error('Load error', err);
       } finally {
@@ -135,66 +156,58 @@
       }
     }
 
-    // Пошук (нормалізуємо)
     function normalize(s){ return (s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
 
-    function searchCountries(query){
-      if (!query) return [];
-      const q = normalize(query);
+    function searchCountries(q){
+      if (!q) return [];
+      const norm = normalize(q);
       const results = [];
       const seen = new Set();
-      // 1) пріоритетні: починається з
       for (const c of countries){
         const lc = c.toLowerCase();
-        if (lc.startsWith(q) && !seen.has(lc)){ results.push(c); seen.add(lc); if (results.length>=MAX_RESULTS) return results; }
+        if (lc.startsWith(norm) && !seen.has(lc)){ results.push(c); seen.add(lc); if (results.length>=MAX_RESULTS) return results; }
       }
-      // 2) містить
       for (const c of countries){
         const lc = c.toLowerCase();
-        if (!seen.has(lc) && lc.includes(q)){ results.push(c); seen.add(lc); if (results.length>=MAX_RESULTS) return results; }
+        if (!seen.has(lc) && lc.includes(norm)){ results.push(c); seen.add(lc); if (results.length>=MAX_RESULTS) return results; }
       }
       return results;
     }
 
-    // Побудова списку підказок
     function renderList(items){
-      listEl.innerHTML = '';
-      if (!items || items.length === 0){
-        listEl.hidden = true;
-        countryInput.setAttribute('aria-expanded','false');
-        return;
-      }
+      listbox.innerHTML = '';
+      if (!items || items.length === 0){ listbox.hidden = true; combobox.setAttribute('aria-expanded','false'); return; }
       const frag = document.createDocumentFragment();
       items.forEach((name, idx) => {
         const li = document.createElement('li');
-        li.role = 'option';
+        li.setAttribute('role','option');
         li.tabIndex = -1;
         li.textContent = name;
         li.dataset.index = idx;
-        li.addEventListener('click', ()=> chooseItem(name));
-        li.addEventListener('mousedown', e => e.preventDefault()); // prevent blur before click
+        li.addEventListener('mousedown', e=> e.preventDefault()); // prevent blur before click
+        li.addEventListener('click', ()=> {
+          chooseCountry(name);
+        });
         frag.appendChild(li);
       });
-      listEl.appendChild(frag);
-      listEl.hidden = false;
-      countryInput.setAttribute('aria-expanded','true');
+      listbox.appendChild(frag);
+      listbox.hidden = false;
+      combobox.setAttribute('aria-expanded','true');
     }
 
-    // Вибір елементу
-    function chooseItem(name){
-      countryInput.value = name;
+    function closeList(){
+      listbox.innerHTML = '';
+      listbox.hidden = true;
+      combobox.setAttribute('aria-expanded','false');
+    }
+
+    function chooseCountry(name){
+      searchInput.value = name;
       closeList();
       compute();
+      clearBtn.style.display = 'inline-block';
     }
 
-    // Закрити список
-    function closeList(){
-      listEl.innerHTML = '';
-      listEl.hidden = true;
-      countryInput.setAttribute('aria-expanded','false');
-    }
-
-    // Вирішення канонічної назви через alias
     function resolveCountry(input){
       if (!input) return '';
       const trimmed = input.trim();
@@ -205,45 +218,49 @@
       return alias && ratesMap[alias] ? alias : '';
     }
 
-    // Клавіатурна навігація
+    // keyboard navigation
     function onKeyDown(e){
-      const items = Array.from(listEl.querySelectorAll('li'));
+      const items = Array.from(listbox.querySelectorAll('li'));
       if (!items.length) return;
-      const activeIndex = items.findIndex(it => it.getAttribute('aria-selected') === 'true');
-      let idx = activeIndex;
-      if (e.key === 'ArrowDown'){ e.preventDefault(); idx = Math.min(activeIndex + 1, items.length - 1); highlight(items, idx); }
-      else if (e.key === 'ArrowUp'){ e.preventDefault(); idx = Math.max(activeIndex - 1, 0); highlight(items, idx); }
-      else if (e.key === 'Enter'){ e.preventDefault(); const target = items[activeIndex] || items[0]; if (target) chooseItem(target.textContent); }
+      const active = items.findIndex(it => it.getAttribute('aria-selected') === 'true');
+      let idx = active;
+      if (e.key === 'ArrowDown'){ e.preventDefault(); idx = Math.min(active + 1, items.length - 1); highlight(items, idx); }
+      else if (e.key === 'ArrowUp'){ e.preventDefault(); idx = Math.max(active - 1, 0); highlight(items, idx); }
+      else if (e.key === 'Enter'){ e.preventDefault(); const target = items[active] || items[0]; if (target) chooseCountry(target.textContent); }
       else if (e.key === 'Escape'){ closeList(); }
     }
 
     function highlight(items, idx){
-      items.forEach(i => i.removeAttribute('aria-selected'));
-      if (items[idx]) {
-        items[idx].setAttribute('aria-selected','true');
-        items[idx].scrollIntoView({block:'nearest'});
-      }
+      items.forEach(i=>i.removeAttribute('aria-selected'));
+      if (items[idx]) { items[idx].setAttribute('aria-selected','true'); items[idx].scrollIntoView({block:'nearest'}); }
     }
 
-    // Події
-    const onInputDebounced = debounce(function(){
-      const val = countryInput.value;
-      // якщо повністю співпадає з країною — закрити список
-      if (ratesMap[val] || Object.keys(ratesMap).find(c => c.toLowerCase() === val.toLowerCase())) { closeList(); return; }
-      const results = searchCountries(val);
+    const onInputDebounced = debounce(()=>{
+      const v = searchInput.value;
+      // if exact match, close
+      if (ratesMap[v] || Object.keys(ratesMap).find(c => c.toLowerCase() === v.toLowerCase())) { closeList(); return; }
+      const results = searchCountries(v);
       renderList(results);
     }, DEBOUNCE_MS);
 
-    countryInput.addEventListener('input', onInputDebounced);
-    countryInput.addEventListener('focus', onInputDebounced);
-    countryInput.addEventListener('keydown', onKeyDown);
+    // Bind events
+    searchInput.addEventListener('input', onInputDebounced);
+    searchInput.addEventListener('focus', onInputDebounced);
+    searchInput.addEventListener('keydown', onKeyDown);
 
-    // Клік поза елементом закриває список
-    document.addEventListener('click', (e)=>{
-      if (!e.target.closest('.autocomplete')) closeList();
+    clearBtn.addEventListener('click', ()=>{
+      searchInput.value = '';
+      clearBtn.style.display = 'none';
+      searchInput.focus();
+      closeList();
+      compute();
     });
 
-    // Обчислення
+    document.addEventListener('click', (e)=>{
+      if (!e.target.closest('#selectRouteTo')) closeList();
+    });
+
+    // Calculation logic
     function parseNumber(el){ const v = parseFloat(el.value); return Number.isFinite(v) ? v : 0; }
     function formatNumber(v){ return (Math.round(v*100)/100).toFixed(2); }
 
@@ -255,7 +272,7 @@
       const actual = parseNumber(weightEl), billable = Math.max(vol, actual);
       billableEl.textContent = formatNumber(billable);
 
-      const userInput = countryInput.value || '';
+      const userInput = searchInput.value || '';
       const resolved = resolveCountry(userInput);
       const r = ratesMap[resolved] || fallbackRate;
       let price = 0;
@@ -267,19 +284,15 @@
       priceEl.textContent = billable > 10 ? `${priceText} (10 кг = ${r.over10}, понад 10 кг = ${r.perKg})` : priceText;
     }
 
-    // Обновлення формули
     function updateFormulaFields(){
       fL.textContent = lengthEl.value || 'довжина';
       fW.textContent = widthEl.value || 'ширина';
       fH.textContent = heightEl.value || 'висота';
     }
 
-    // Події для числових полів
-    [lengthEl, widthEl, heightEl, weightEl].forEach(el => {
-      el.addEventListener('input', ()=>{ updateFormulaFields(); compute(); });
-    });
+    [lengthEl, widthEl, heightEl, weightEl].forEach(el=>el.addEventListener('input', ()=>{ updateFormulaFields(); compute(); }));
 
-    // Ініціалізація
+    // init
     loadData();
   </script>
 </body>
