@@ -123,40 +123,6 @@
           return '';
         }
 
-        // dynamic datalist filtering for country input
-        function updateCountryDatalist() {
-          const userInput = countryEl.value || '';
-          const filter = userInput.trim().toLowerCase();
-          // clear datalist
-          while (list.firstChild) list.removeChild(list.firstChild);
-          // collect all canonical names that match input or its synonym
-          const shown = new Set();
-          // 1. If input matches a synonym, show the canonical name
-          const resolved = resolveCountry(userInput);
-          if (resolved) {
-            shown.add(resolved);
-          }
-          // 2. Show all countries containing the input (case-insensitive)
-          Object.keys(ratesMap).forEach(cn => {
-            if (!filter || cn.toLowerCase().includes(filter)) {
-              shown.add(cn);
-            }
-          });
-          // 3. Show all canonical names for which any synonym matches the input
-          Object.keys(aliasMap).forEach(syn => {
-            if (syn.includes(filter)) {
-              const canon = aliasMap[syn];
-              if (ratesMap[canon]) shown.add(canon);
-            }
-          });
-          // Fill datalist
-          shown.forEach(cn => {
-            const opt = document.createElement('option');
-            opt.value = cn;
-            list.appendChild(opt);
-          });
-        }
-
         countryEl.addEventListener('input', updateCountryDatalist);
         // initial fill
         updateCountryDatalist();
@@ -288,4 +254,5 @@
   </script>
 </body>
 </html>
+
 
