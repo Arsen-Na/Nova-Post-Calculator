@@ -93,7 +93,9 @@
 
     <!-- Мобільний -->
     <label for="countrySelect">Країна одержувача (мобільний)</label>
-    <select id="countrySelect"></select>
+    <select id="countrySelect">
+      <option value="" disabled selected>Оберіть країну...</option>
+    </select>
 
     <div class="result" aria-live="polite">
       <div class="note">Формула: <span class="formula">(<span id="f-l">довжина</span> × <span id="f-w">ширина</span> × <span id="f-h">висота</span>) ÷ 4000</span></div>
@@ -102,7 +104,7 @@
       <div><strong>Ціна:</strong> <span id="price">—</span> <span class="muted">PLN</span></div>
     </div>
   </main>
-
+  
   <script>
     const lengthEl = document.getElementById('length'),
           widthEl = document.getElementById('width'),
@@ -169,4 +171,5 @@
   </script>
 </body>
 </html>
+
 
