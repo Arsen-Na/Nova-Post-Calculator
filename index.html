@@ -31,15 +31,14 @@
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  align-items: stretch; /* зберігає рівну висоту колонок */
+  align-items: stretch; 
 }
 
 .row > div {
-  display: flex;
   flex-direction: column;
-  justify-content: center; /* вертикальне центрування елементів всередині колонки */
-  gap: 8px;                 /* відступ між label і input */
-  min-height: 84px;         /* необов'язково: при потребі встановіть бажану висоту */
+  justify-content: center; 
+  gap: 8px;                
+  min-height: 84px;        
   padding: 12px 10px 4px;
 }
   </style>
@@ -140,7 +139,7 @@ const T = {
     weight: 'Фактична вага (kg)', country: "Країна одержувача",
     mobilePlaceholder: 'Завантаження…', formula: { l: 'довжина', w: 'ширина', h: 'висота' },
     volumetric: "Об'ємна вага:", billable: "Платна вага:", price: "Ціна:", unitKg: 'kg', currency: 'PLN',
-    countryInputPlaceholder: 'Polska'
+    countryInputPlaceholder: 'Польща'
   },
   en: {
     langLabel: 'Language', title: 'Price calculator',
@@ -395,4 +394,5 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+
 
