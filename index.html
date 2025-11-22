@@ -8,46 +8,30 @@
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:16px;background:#f7f7f8;color:#111}
     .card{max-width:640px;margin:0 auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 6px 24px rgba(20,20,30,0.06)}
     h1{margin:0 0 12px;font-size:20px} label{display:block;margin-top:12px;font-weight:600}
-    input[type=number], select, .country-input {width:100%;box-sizing:border-box;padding:8px 10px;margin-top:6px;font-size:16px;border:1px solid #dcdde1;border-radius:6px;background:#fff}
+    input[type=number], select, .country-input{width:100%;box-sizing:border-box;padding:8px 10px;margin-top:6px;font-size:16px;border:1px solid #dcdde1;border-radius:6px;background:#fff}
     .row{display:flex;gap:12px;flex-wrap:wrap}
     .row>div{flex:1;min-width:120px;border:1.5px solid #e0e0e0;border-radius:8px;padding:12px 10px 4px;box-shadow:0 2px 8px rgba(20,20,30,0.03)}
     .result{margin-top:18px;padding:12px;background:#f0f8ff;border:1px solid #dbeefe;border-radius:6px}
     .formula{font-family:monospace;background:#f4f4f6;padding:6px;border-radius:6px;display:inline-block}
-    .muted{color:#666;font-size:14px} .note{margin-top:8px;color:#444}
+    .muted{color:#666;font-size:14px}.note{margin-top:8px;color:#444}
     .autocomplete-wrapper{position:relative}
     .dropdown{position:absolute;left:0;right:0;margin-top:6px;border:1px solid #e0e0e0;background:#fff;border-radius:8px;max-height:240px;overflow:auto;box-shadow:0 8px 30px rgba(20,20,30,0.08);list-style:none;padding:6px 0;margin:0;z-index:1000}
     .dropdown li{padding:8px 12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .dropdown li:hover, .dropdown li[aria-selected="true"]{background:#f5f7fa}
-    #countrySelect, label[for=countrySelect]{display:none}
-    @media (max-width:768px){
-      #countryInput, label[for=countryInput]{display:none}
-      #countrySelect, label[for=countrySelect]{display:block}
-    }
-    @media (max-width:600px){
-      body{margin:8px}.card{padding:12px}h1{font-size:18px}input,select{font-size:14px}
-    }
-    .lang-row{display:flex;justify-content:flex-end}
-    .lang-select{width:170px}
-
-    /* vertical centering inside .row columns (keeps existing look) */
-    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch; }
-    /* removed display:flex from .row > div as requested; keep layout spacing */
-    .row > div { flex-direction: column; justify-content: center; gap: 8px; min-height: 84px; padding: 12px 10px 4px; }
-
-    /* small helper for the new estimated value input to keep spacing consistent */
-    .after-country { margin-top: 6px; }
-
-    /* customs block (same visual family as .result) */
-    .customs {
-      margin-top:12px;padding:12px;background:#fff7f0;border:1px solid #f2d9c4;border-radius:6px;
-      color:#111;
-    }
+    .dropdown li:hover,.dropdown li[aria-selected="true"]{background:#f5f7fa}
+    #countrySelect,label[for=countrySelect]{display:none}
+    @media (max-width:768px){#countryInput,label[for=countryInput]{display:none}#countrySelect,label[for=countrySelect]{display:block}}
+    @media (max-width:600px){body{margin:8px}.card{padding:12px}h1{font-size:18px}input,select{font-size:14px}}
+    .lang-row{display:flex;justify-content:flex-end}.lang-select{width:170px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
+    .row>div{flex-direction:column;justify-content:center;gap:8px;min-height:84px;padding:12px 10px 4px}
+    .after-country{margin-top:6px}
+    .customs{margin-top:12px;padding:12px;background:#fff7f0;border:1px solid #f2d9c4;border-radius:6px;color:#111}
   </style>
 </head>
 <body>
 <main class="card">
   <div class="lang-row">
-    <label for="langSelect" style="font-weight:600;margin-top:0;margin-right:8px;align-self:center" id="label-lang">Мова</label>
+    <label for="langSelect" id="label-lang" style="font-weight:600;margin-top:0;margin-right:8px;align-self:center">Мова</label>
     <select id="langSelect" class="lang-select" aria-label="Language selector">
       <option value="uk">Українська</option>
       <option value="en">English</option>
@@ -56,7 +40,6 @@
   </div>
 
   <h1 id="title">Калькулятор ціни</h1>
-
   <p class="muted" id="intro">Введіть розміри в сантиметрах та фактичну вагу в кілограмах.</p>
 
   <div class="row">
@@ -83,11 +66,8 @@
   </div>
 
   <label for="countrySelect" id="label-countrySelect" style="display:none">Країна одержувача</label>
-  <select id="countrySelect" style="display:none">
-    <option value="" disabled selected id="mobile-placeholder">Завантаження…</option>
-  </select>
+  <select id="countrySelect" style="display:none"><option value="" disabled selected id="mobile-placeholder">Завантаження…</option></select>
 
-  <!-- Estimated value input -->
   <div class="after-country">
     <label for="declaredValue" id="label-declared">Оціночна вартість</label>
     <input id="declaredValue" type="number" inputmode="decimal" pattern="[0-9]*" step="any" min="0" placeholder="0">
@@ -95,13 +75,11 @@
 
   <div class="result" aria-live="polite">
     <div class="note" id="formula-row">Формула: <span class="formula">(<span id="f-l">довжина</span> × <span id="f-w">ширина</span> × <span id="f-h">висота</span>) ÷ 4000</span></div>
-
     <div style="margin-top:8px"><strong id="label-volumetric">Об'ємна вага:</strong> <span id="volumetric">—</span> <span class="muted" id="unit-kg">kg</span></div>
     <div style="margin-top:8px"><strong id="label-billable">Платна вага:</strong> <span id="billable">—</span> <span class="muted" id="unit-kg-2">kg</span></div>
     <div style="margin-top:8px"><strong id="label-price">Ціна:</strong> <span id="price">—</span> <span class="muted" id="unit-currency">PLN</span></div>
   </div>
 
-  <!-- customs block (injected/shown when conditions met) -->
   <div id="customsBlock" class="customs" style="display:none" aria-live="polite">
     <strong id="customsText">Вартість митних платежів складе: —</strong>
     <div id="customsDetails" class="muted" style="margin-top:6px"></div>
@@ -109,436 +87,155 @@
 </main>
 
 <script>
-/* Elements */
-const htmlEl = document.documentElement;
-const langSelect = document.getElementById('langSelect');
-const titleEl = document.getElementById('title');
-const introEl = document.getElementById('intro');
+const htmlEl=document.documentElement;
+const el=id=>document.getElementById(id);
+const langSelect=el('langSelect'), titleEl=el('title'), introEl=el('intro');
+const lengthEl=el('length'), widthEl=el('width'), heightEl=el('height'), weightEl=el('weight');
+const volumetricEl=el('volumetric'), billableEl=el('billable'), priceEl=el('price');
+const fL=el('f-l'), fW=el('f-w'), fH=el('f-h');
+const countryInput=el('countryInput'), countrySelect=el('countrySelect');
+const declaredEl=el('declaredValue');
+const labelLang=el('label-lang'), labelCountrySelect=el('label-countrySelect');
+const customsBlock=el('customsBlock'), customsText=el('customsText'), customsDetails=el('customsDetails');
+const unitKg=el('unit-kg'), unitKg2=el('unit-kg-2'), unitCurrency=el('unit-currency'), formulaRow=el('formula-row');
 
-const lengthEl = document.getElementById('length'),
-      widthEl = document.getElementById('width'),
-      heightEl = document.getElementById('height'),
-      weightEl = document.getElementById('weight'),
-      volumetricEl = document.getElementById('volumetric'),
-      billableEl = document.getElementById('billable'),
-      priceEl = document.getElementById('price'),
-      fL = document.getElementById('f-l'),
-      fW = document.getElementById('f-w'),
-      fH = document.getElementById('f-h');
-
-const countryInput = document.getElementById('countryInput'),
-      countrySelect = document.getElementById('countrySelect'),
-      mobilePlaceholder = document.getElementById('mobile-placeholder');
-
-const declaredEl = document.getElementById('declaredValue');
-
-const labelLang = document.getElementById('label-lang');
-const labelLength = document.getElementById('label-length');
-const labelWidth = document.getElementById('label-width');
-const labelHeight = document.getElementById('label-height');
-const labelWeight = document.getElementById('label-weight');
-const labelCountry = document.getElementById('label-country');
-const labelCountrySelect = document.getElementById('label-countrySelect');
-const labelVolumetric = document.getElementById('label-volumetric');
-const labelBillable = document.getElementById('label-billable');
-const labelPrice = document.getElementById('label-price');
-const unitKg = document.getElementById('unit-kg');
-const unitKg2 = document.getElementById('unit-kg-2');
-const unitCurrency = document.getElementById('unit-currency');
-const labelDeclared = document.getElementById('label-declared');
-const formulaRow = document.getElementById('formula-row');
-
-const customsBlock = document.getElementById('customsBlock');
-const customsText = document.getElementById('customsText');
-const customsDetails = document.getElementById('customsDetails');
-
-/* Translations and small text pieces for price breakdown and customs */
-const T = {
-  uk: {
-    langLabel: 'Мова', title: 'Калькулятор ціни',
-    intro: "Введіть розміри в сантиметрах та фактичну вагу в кілограмах.",
-    length: 'Довжина (cm)', width: 'Ширина (cm)', height: 'Висота (cm)',
-    weight: 'Фактична вага (kg)', country: "Країна одержувача",
-    mobilePlaceholder: 'Завантаження…', formulaWords: { l: 'довжина', w: 'ширина', h: 'висота' },
-    formulaLabel: 'Формула',
-    volumetric: "Об'ємна вага:", billable: "Платна вага:", price: "Ціна:", unitKg: 'kg', currency: 'PLN',
-    countryInputPlaceholder: 'Polska',
-    declaredLabel: 'Оціночна вартість',
-    declaredPlaceholder: '0',
-    per10: 'за 10 КГ',
-    perExtra: 'за кожен наступний КГ',
-    insuranceText: '0.5% "страхування" від ОВ',
-    andSeparator: ', ',
-    customsTitle: 'Вартість митних платежів складе:',
-    customsDetailFmt: (eur, uah, pln) => ` ${eur} EUR або ${uah} UAH або ${pln} PLN`
-  },
-  en: {
-    langLabel: 'Language', title: 'Price calculator',
-    intro: "Enter dimensions in centimetres and actual weight in kilograms.",
-    length: 'Length (cm)', width: 'Width (cm)', height: 'Height (cm)',
-    weight: 'Actual weight (kg)', country: "Destination country",
-    mobilePlaceholder: 'Loading…', formulaWords: { l: 'length', w: 'width', h: 'height' },
-    formulaLabel: 'Formula',
-    volumetric: "Volumetric weight:", billable: "Billable weight:", price: "Price:", unitKg: 'kg', currency: 'PLN',
-    countryInputPlaceholder: 'Poland',
-    declaredLabel: 'Estimated value',
-    declaredPlaceholder: '0',
-    per10: 'for 10 KG',
-    perExtra: 'for each next KG',
-    insuranceText: '0.5% "insurance" of EV',
-    andSeparator: ', ',
-    customsTitle: 'Customs payments will be:',
-    customsDetailFmt: (eur, uah, pln) => ` ${eur} EUR or ${uah} UAH or ${pln} PLN`
-  },
-  pl: {
-    langLabel: 'Język', title: 'Kalkulator ceny',
-    intro: "Wprowadź wymiary w centymetrach i rzeczywistą wagę w kilogramach.",
-    length: 'Długość (cm)', width: 'Szerokość (cm)', height: 'Wysokość (cm)',
-    weight: 'Rzeczywista waga (kg)', country: "Kraj odbiorcy",
-    mobilePlaceholder: 'Ładowanie…', formulaWords: { l: 'długość', w: 'szerokość', h: 'wysokość' },
-    formulaLabel: 'Formuła',
-    volumetric: "Waga objętościowa:", billable: "Waga obciążalna:", price: "Cena:", unitKg: 'kg', currency: 'PLN',
-    countryInputPlaceholder: 'Polska',
-    declaredLabel: 'Wartość szacunkowa',
-    declaredPlaceholder: '0',
-    per10: 'za 10 KG',
-    perExtra: 'za każdy kolejny KG',
-    insuranceText: '0.5% "ubezpieczenie" od WS', // corrected WŚ -> WS
-    andSeparator: ', ',
-    customsTitle: 'Koszty opłat celnych wyniosą:',
-    customsDetailFmt: (eur, uah, pln) => ` ${eur} EUR lub ${uah} UAH lub ${pln} PLN`
-  }
+const T={
+ uk:{langLabel:'Мова',title:'Калькулятор ціни',intro:"Введіть розміри в сантиметрах та фактичну вагу в кілограмах.",length:'Довжина (cm)',width:'Ширина (cm)',height:'Висота (cm)',weight:'Фактична вага (kg)',country:"Країна одержувача",mobilePlaceholder:'Завантаження…',formulaWords:{l:'довжина',w:'ширина',h:'висота'},formulaLabel:'Формула',volumetric:"Об'ємна вага:",billable:"Платна вага:",price:"Ціна:",unitKg:'kg',currency:'PLN',countryInputPlaceholder:'Polska',declaredLabel:'Оціночна вартість',declaredPlaceholder:'0',per10:'за 10 КГ',perExtra:'за кожен наступний КГ',insuranceText:'0.5% \"страхування\" від ОВ',andSeparator:', ',customsTitle:'Вартість митних платежів складе:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR або ${uah} UAH або ${pln} PLN`},
+ en:{langLabel:'Language',title:'Price calculator',intro:"Enter dimensions in centimetres and actual weight in kilograms.",length:'Length (cm)',width:'Width (cm)',height:'Height (cm)',weight:'Actual weight (kg)',country:"Destination country",mobilePlaceholder:'Loading…',formulaWords:{l:'length',w:'width',h:'height'},formulaLabel:'Formula',volumetric:"Volumetric weight:",billable:"Billable weight:",price:"Price:",unitKg:'kg',currency:'PLN',countryInputPlaceholder:'Poland',declaredLabel:'Estimated value',declaredPlaceholder:'0',per10:'for 10 KG',perExtra:'for each next KG',insuranceText:'0.5% \"insurance\" of EV',andSeparator:', ',customsTitle:'Customs payments will be:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR or ${uah} UAH or ${pln} PLN`},
+ pl:{langLabel:'Język',title:'Kalkulator ceny',intro:"Wprowadź wymiary w centymetrach i rzeczywistą wagę w kilogramach.",length:'Długość (cm)',width:'Szerokość (cm)',height:'Wysokość (cm)',weight:'Rzeczywista waga (kg)',country:"Kraj odbiorcy",mobilePlaceholder:'Ładowanie…',formulaWords:{l:'długość',w:'szerokość',h:'wysokość'},formulaLabel:'Formuła',volumetric:"Waga objętościowa:",billable:"Waga obciążalna:",price:"Cena:",unitKg:'kg',currency:'PLN',countryInputPlaceholder:'Polska',declaredLabel:'Wartość szacunkowa',declaredPlaceholder:'0',per10:'za 10 KG',perExtra:'za każdy kolejny KG',insuranceText:'0.5% \"ubezpieczenie\" od WS',andSeparator:', ',customsTitle:'Koszty opłat celnych wyniosą:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR lub ${uah} UAH lub ${pln} PLN`}
 };
 
-/* State for countries & rates */
-let countries = [], ratesMap = {}, aliasMap = {};
-const fallbackRate = { s:100, m:150, over10:300, perKg:8 };
+let countries=[],ratesMap={},aliasMap={};
+const fallbackRate={s:100,m:150,over10:300,perKg:8};
 
-/* Utilities */
-const debounce = (fn, ms=120)=>{ let t; return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), ms); }; };
-const parseNumber = el => { const v = parseFloat(el.value); return Number.isFinite(v) ? v : 0; };
-const formatNumber = v => (Math.round(v*100)/100).toFixed(2);
-const normalize = s => (s||'').toLowerCase().replace(/\s+/g,' ').trim();
+const debounce=(fn,ms=120)=>{let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
+const parseNumber=el=>{const v=parseFloat(el.value);return Number.isFinite(v)?v:0;};
+const formatNumber=v=>((Math.round(v*100)/100).toFixed(2));
+const normalize=s=>(s||'').toLowerCase().replace(/\s+/g,' ').trim();
 
-/* Exchange rates caching (to avoid repeated calls) */
-let FX = { EUR_PLN: null, EUR_UAH: null, lastFetched: 0 };
-const FX_TTL = 1000 * 60 * 30; // 30 minutes
-
-/* Fetch latest EUR->PLN and EUR->UAH rates via exchangerate.host */
+let FX={EUR_PLN:null,EUR_UAH:null,lastFetched:0},FX_TTL=1000*60*30;
 async function fetchFxRates(){
-  const now = Date.now();
-  if (FX.lastFetched && (now - FX.lastFetched) < FX_TTL && FX.EUR_PLN && FX.EUR_UAH) return FX;
-  try {
-    const res = await fetch('https://api.exchangerate.host/latest?base=EUR&symbols=PLN,UAH');
-    if (!res.ok) throw new Error('fx fetch failed');
-    const data = await res.json();
-    FX.EUR_PLN = data.rates.PLN; // PLN per 1 EUR
-    FX.EUR_UAH = data.rates.UAH; // UAH per 1 EUR
-    FX.lastFetched = Date.now();
+  const now=Date.now();
+  if(FX.lastFetched&&now-FX.lastFetched<FX_TTL&&FX.EUR_PLN&&FX.EUR_UAH)return FX;
+  try{
+    const res=await fetch('https://api.exchangerate.host/latest?base=EUR&symbols=PLN,UAH');
+    if(!res.ok)throw 0;
+    const data=await res.json();
+    FX.EUR_PLN=data.rates.PLN;FX.EUR_UAH=data.rates.UAH;FX.lastFetched=Date.now();
     return FX;
-  } catch (e) {
-    // fallback static-ish rates if network fails (safe default)
-    FX.EUR_PLN = FX.EUR_PLN || 4.3;
-    FX.EUR_UAH = FX.EUR_UAH || 40;
-    FX.lastFetched = Date.now();
-    return FX;
+  }catch(e){
+    FX.EUR_PLN=FX.EUR_PLN||4.3;FX.EUR_UAH=FX.EUR_UAH||40;FX.lastFetched=Date.now();return FX;
   }
 }
 
-/* Map language to file name */
-function ratesFileForLang(lang){
-  if (lang === 'pl') return './rates.json';
-  if (lang === 'uk') return './rates-ua.json';
-  if (lang === 'en') return './rates-eng.json';
-  return './rates.json';
-}
+function ratesFileForLang(lang){if(lang==='pl')return'./rates.json';if(lang==='uk')return'./rates-ua.json';if(lang==='en')return'./rates-eng.json';return'./rates.json';}
 
-/* Apply UI translations */
 function applyTranslations(lang){
-  const t = T[lang] || T.uk;
-  htmlEl.lang = lang;
-  labelLang.textContent = t.langLabel;
-  titleEl.textContent = t.title;
-  introEl.textContent = t.intro;
-  labelLength.textContent = t.length;
-  labelWidth.textContent = t.width;
-  labelHeight.textContent = t.height;
-  labelWeight.textContent = t.weight;
-  labelCountry.textContent = t.country;
-  labelCountrySelect.textContent = t.country;
-  labelVolumetric.textContent = t.volumetric;
-  labelBillable.textContent = t.billable;
-  labelPrice.textContent = t.price;
-  unitKg.textContent = t.unitKg;
-  unitKg2.textContent = t.unitKg;
-  unitCurrency.textContent = t.currency;
-  countryInput.placeholder = t.countryInputPlaceholder;
-  fL.textContent = t.formulaWords.l;
-  fW.textContent = t.formulaWords.w;
-  fH.textContent = t.formulaWords.h;
-  labelDeclared.textContent = t.declaredLabel;
-  declaredEl.placeholder = t.declaredPlaceholder;
-
-  // update formula block label + existing formula span
-  formulaRow.innerHTML = `${t.formulaLabel}: <span class="formula">(<span id="f-l">${t.formulaWords.l}</span> × <span id="f-w">${t.formulaWords.w}</span> × <span id="f-h">${t.formulaWords.h}</span>) ÷ 4000</span>`;
-  // rebind fL/fW/fH after innerHTML replacement
-  // (they are already referenced above; re-query to be safe)
-  window.fL = document.getElementById('f-l');
-  window.fW = document.getElementById('f-w');
-  window.fH = document.getElementById('f-h');
+  const t=T[lang]||T.uk;
+  htmlEl.lang=lang;
+  labelLang.textContent=t.langLabel;titleEl.textContent=t.title;introEl.textContent=t.intro;
+  el('label-length').textContent=t.length;el('label-width').textContent=t.width;el('label-height').textContent=t.height;
+  el('label-weight').textContent=t.weight;el('label-country').textContent=t.country;labelCountrySelect.textContent=t.country;
+  el('label-volumetric').textContent=t.volumetric;el('label-billable').textContent=t.billable;el('label-price').textContent=t.price;
+  unitKg.textContent=t.unitKg;unitKg2.textContent=t.unitKg;unitCurrency.textContent=t.currency;
+  countryInput.placeholder=t.countryInputPlaceholder;fL.textContent=t.formulaWords.l;fW.textContent=t.formulaWords.w;fH.textContent=t.formulaWords.h;
+  el('label-declared').textContent=t.declaredLabel;declaredEl.placeholder=t.declaredPlaceholder;
+  formulaRow.innerHTML=`${t.formulaLabel}: <span class="formula">(<span id="f-l">${t.formulaWords.l}</span> × <span id="f-w">${t.formulaWords.w}</span> × <span id="f-h">${t.formulaWords.h}</span>) ÷ 4000</span>`;
+  window.fL=document.getElementById('f-l');window.fW=document.getElementById('f-w');window.fH=document.getElementById('f-h');
 }
 
-/* Load rates file for current language, populate countries & maps */
 async function loadRatesForLang(lang){
-  const file = ratesFileForLang(lang);
-  countries = []; ratesMap = {}; aliasMap = {};
-  try {
-    const res = await fetch(file);
-    if (!res.ok) throw new Error('not found');
-    const data = await res.json();
-    data.forEach(item => {
-      const name = item.country;
-      countries.push(name);
-      ratesMap[name] = item;
-    });
-    try {
-      const aliasFile = file.replace('.json','_aliases.json');
-      const aRes = await fetch(aliasFile);
-      if (aRes.ok){
-        const aData = await aRes.json();
-        Object.keys(aData).forEach(k => { aliasMap[k.toLowerCase()] = aData[k]; });
-      }
-    } catch(e){}
+  const file=ratesFileForLang(lang);
+  countries=[];ratesMap={};aliasMap={};
+  try{
+    const res=await fetch(file);if(!res.ok)throw 0;
+    const data=await res.json();
+    data.forEach(item=>{const name=item.country;countries.push(name);ratesMap[name]=item;});
+    try{const aRes=await fetch(file.replace('.json','_aliases.json'));if(aRes.ok){const aData=await aRes.json();Object.keys(aData).forEach(k=>aliasMap[k.toLowerCase()]=aData[k]);}}catch(e){}
     populateCountrySelects();
-    const preferred = countries.find(c => /Polska|Poland|Україна|Ukraine/i.test(c)) || countries[0] || '';
-    if (preferred){ countryInput.value = preferred; countrySelect.value = preferred; }
-  } catch(err){
-    console.warn('Rates file load failed', file, err);
-    countrySelect.innerHTML = '<option value="" disabled selected>Not available</option>';
-    countries = []; ratesMap = {};
-  } finally {
-    compute();
-  }
+    const preferred=countries.find(c=>/Polska|Poland|Україна|Ukraine/i.test(c))||countries[0]||'';
+    if(preferred){countryInput.value=preferred;countrySelect.value=preferred;}
+  }catch(e){
+    countrySelect.innerHTML='<option value="" disabled selected>Not available</option>';countries=[];ratesMap={};
+  }finally{compute();}
 }
 
-/* Populate mobile select */
-function populateCountrySelects(){
-  countrySelect.innerHTML = '';
-  const frag = document.createDocumentFragment();
-  countries.forEach(name => {
-    const opt = document.createElement('option');
-    opt.value = name;
-    opt.textContent = name;
-    frag.appendChild(opt);
-  });
-  countrySelect.appendChild(frag);
-}
+function populateCountrySelects(){countrySelect.innerHTML='';const frag=document.createDocumentFragment();countries.forEach(name=>{const o=document.createElement('option');o.value=name;o.textContent=name;frag.appendChild(o);});countrySelect.appendChild(frag);}
 
-/* Resolve canonical country name */
-function resolveCountry(input){
-  if (!input) return '';
-  if (ratesMap[input]) return input;
-  const found = Object.keys(ratesMap).find(c => c.toLowerCase() === input.toLowerCase());
-  if (found) return found;
-  const alias = aliasMap[input.toLowerCase()];
-  if (alias && ratesMap[alias]) return alias;
-  return '';
-}
+function resolveCountry(input){if(!input)return'';if(ratesMap[input])return input;const found=Object.keys(ratesMap).find(c=>c.toLowerCase()===input.toLowerCase());if(found)return found;const alias=aliasMap[input.toLowerCase()];if(alias&&ratesMap[alias])return alias;return'';}
 
-/* Syncs */
-function syncCountryToSelect(){ const r = resolveCountry(countryInput.value); if (r) countrySelect.value = r; }
-function syncSelectToInput(){ if (countrySelect.value) countryInput.value = countrySelect.value; }
+function syncCountryToSelect(){const r=resolveCountry(countryInput.value);if(r)countrySelect.value=r;}
+function syncSelectToInput(){if(countrySelect.value)countryInput.value=countrySelect.value;}
 
-/* Compute price and customs display */
 async function compute(){
-  const t = T[htmlEl.lang] || T.uk;
+  const t=T[htmlEl.lang]||T.uk;
+  const L=parseNumber(lengthEl),W=parseNumber(widthEl),H=parseNumber(heightEl);
+  if(!L||!W||!H){volumetricEl.textContent=billableEl.textContent=priceEl.textContent='—';hideCustoms();return;}
+  const vol=(L*W*H)/4000;volumetricEl.textContent=formatNumber(vol);
+  const actual=parseNumber(weightEl),billable=Math.max(vol,actual);billableEl.textContent=formatNumber(billable);
+  const userInput=countryInput.value||countrySelect.value||'';const r=ratesMap[resolveCountry(userInput)]||fallbackRate;
+  let basePrice,priceFor10kg=null,perExtraKg=null;
+  if(billable<=2)basePrice=r.s;else if(billable<=10)basePrice=r.m;else{priceFor10kg=r.over10;perExtraKg=r.perKg;basePrice=r.over10+(Math.ceil(billable)-10)*r.perKg;}
+  const declared=parseNumber(declaredEl);
+  let surcharge=0,surchargeShown=0;if(declared>=1000){surcharge=declared*0.005;surchargeShown=surcharge;}
+  const total=basePrice+surcharge;
+  const parts=[];
+  if(billable>10){if(priceFor10kg==null)priceFor10kg=r.over10;parts.push(`${priceFor10kg} ${t.per10}`);parts.push(`${perExtraKg} ${t.perExtra}`);}
+  if(surchargeShown>0)parts.push(`${formatNumber(surchargeShown)} ${t.insuranceText}`);
+  const inside=parts.length?` (${parts.join(t.andSeparator)})`:'';
+  priceEl.textContent=`${formatNumber(total)} PLN${inside}`;
 
-  const L = parseNumber(lengthEl), W = parseNumber(widthEl), H = parseNumber(heightEl);
-  if (!L || !W || !H){ volumetricEl.textContent = billableEl.textContent = priceEl.textContent = '—'; hideCustoms(); return; }
-  const vol = (L*W*H)/4000;
-  volumetricEl.textContent = formatNumber(vol);
-  const actual = parseNumber(weightEl), billable = Math.max(vol, actual);
-  billableEl.textContent = formatNumber(billable);
-  const userInput = countryInput.value || countrySelect.value || '';
-  const r = ratesMap[resolveCountry(userInput)] || fallbackRate;
-
-  // base price according to table
-  let basePrice, priceFor10kg = null, perExtraKg = null;
-  if (billable <= 2) {
-    basePrice = r.s;
-  } else if (billable <= 10) {
-    basePrice = r.m;
-  } else {
-    priceFor10kg = r.over10;
-    perExtraKg = r.perKg;
-    basePrice = r.over10 + (Math.ceil(billable) - 10) * r.perKg;
-  }
-
-  // declared value surcharge logic
-  const declared = parseNumber(declaredEl);
-  let surcharge = 0;
-  let surchargeShown = 0;
-  if (declared >= 1000) {
-    surcharge = declared * 0.005; // 0.5%
-    surchargeShown = surcharge;
-  }
-
-  const total = basePrice + surcharge;
-
-  // Build detailed price text
-  const parts = [];
-  if (billable > 10) {
-    if (priceFor10kg == null) priceFor10kg = r.over10;
-    parts.push(`${priceFor10kg} ${t.per10}`);
-    parts.push(`${perExtraKg} ${t.perExtra}`);
-  }
-  if (surchargeShown > 0) {
-    parts.push(`${formatNumber(surchargeShown)} ${t.insuranceText}`);
-  }
-  const inside = parts.length ? ` (${parts.join(t.andSeparator)})` : '';
-  priceEl.textContent = `${formatNumber(total)} PLN${inside}`;
-
-  // Customs: only when destination is Ukraine AND declared (converted to EUR) >= 150 EUR
-  const destResolved = resolveCountry(userInput);
-  const isUkraine = destResolved && /Україн|Ukraine|Ukraina/i.test(destResolved);
-  if (isUkraine && declared > 0) {
-    // Need to get EUR value of declared (declared is in PLN)
-    const fx = await fetchFxRates(); // fills FX.EUR_PLN (PLN per 1 EUR)
-    const eurPerPln = 1 / fx.EUR_PLN; // 1 PLN equals how many EUR
-    const declaredEUR = declared * eurPerPln;
-    if (declaredEUR >= 150) {
-      // perform customs calc based on EUR
-      const excess = declaredEUR - 150;
-      const duty = excess * 0.10;
-      const vat = (excess + duty) * 0.20;
-      const customsTotalEUR = duty + vat;
-
-      // Convert customs total to PLN and UAH using fetched rates
-      const customsPLN = customsTotalEUR * fx.EUR_PLN;
-      const customsUAH = customsTotalEUR * fx.EUR_UAH;
-
-      // Format numbers
-      const X_eur = formatNumber(customsTotalEUR);
-      const X_uah = formatNumber(customsUAH);
-      const X_pln = formatNumber(customsPLN);
-
-      // Show customs block with localized text (single line)
-      customsText.textContent = t.customsTitle;
-      customsDetails.textContent = t.customsDetailFmt(X_eur, X_uah, X_pln);
-      customsBlock.style.display = 'block';
+  const destResolved=resolveCountry(userInput);
+  const isUkraine=destResolved&&/Україн|Ukraine|Ukraina/i.test(destResolved);
+  if(isUkraine&&declared>0){
+    const fx=await fetchFxRates();
+    const eurPerPln=1/fx.EUR_PLN;
+    const declaredEUR=declared*eurPerPln;
+    if(declaredEUR>=150){
+      const excess=declaredEUR-150;
+      const duty=excess*0.10;
+      const vat=(excess+duty)*0.20;
+      const customsTotalEUR=duty+vat;
+      const customsPLN=customsTotalEUR*fx.EUR_PLN;
+      const customsUAH=customsTotalEUR*fx.EUR_UAH;
+      const X_eur=formatNumber(customsTotalEUR),X_uah=formatNumber(customsUAH),X_pln=formatNumber(customsPLN);
+      customsText.textContent=t.customsTitle;
+      customsDetails.textContent=t.customsDetailFmt(X_eur,X_uah,X_pln);
+      customsBlock.style.display='block';
       return;
     }
   }
-  // otherwise hide customs
   hideCustoms();
 }
 
-function hideCustoms(){
-  customsBlock.style.display = 'none';
-  customsText.textContent = '';
-  customsDetails.textContent = '';
-}
+function hideCustoms(){customsBlock.style.display='none';customsText.textContent='';customsDetails.textContent='';}
 
-/* Wire events */
-[lengthEl,widthEl,heightEl,weightEl,declaredEl].forEach(el=>el.addEventListener('input', debounce(()=> {
-  // update inline formula words (preserve current language words)
-  const t = T[htmlEl.lang] || T.uk;
-  if (window.fL) window.fL.textContent = lengthEl.value || t.formulaWords.l;
-  if (window.fW) window.fW.textContent = widthEl.value || t.formulaWords.w;
-  if (window.fH) window.fH.textContent = heightEl.value || t.formulaWords.h;
-  compute();
-}, 120)));
+[lengthEl,widthEl,heightEl,weightEl,declaredEl].forEach(el=>el.addEventListener('input',debounce(()=>{const t=T[htmlEl.lang]||T.uk;if(window.fL)window.fL.textContent=lengthEl.value||t.formulaWords.l;if(window.fW)window.fW.textContent=widthEl.value||t.formulaWords.w;if(window.fH)window.fH.textContent=heightEl.value||t.formulaWords.h;compute();},120)));
 
-countryInput.addEventListener('input', debounce(()=>{ syncCountryToSelect(); compute(); },120));
-countryInput.addEventListener('change', ()=>{ syncCountryToSelect(); compute(); });
-countrySelect.addEventListener('change', ()=>{ syncSelectToInput(); compute(); });
+countryInput.addEventListener('input',debounce(()=>{syncCountryToSelect();compute();},120));
+countryInput.addEventListener('change',()=>{syncCountryToSelect();compute();});
+countrySelect.addEventListener('change',()=>{syncSelectToInput();compute();});
 
-/* Desktop dropdown (uses countries[] array) */
 (function desktopDropdown(){
-  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-  if (isMobile) return;
-  const wrapper = countryInput.parentElement;
-  wrapper.style.position = wrapper.style.position || 'relative';
-  const dropdown = document.createElement('ul');
-  dropdown.className = 'dropdown';
-  dropdown.hidden = true;
-  wrapper.appendChild(dropdown);
-  let items = [], highlighted = -1, MAX_SHOW = 200;
-  const render = arr => {
-    dropdown.innerHTML = '';
-    if (!arr || !arr.length){ dropdown.hidden = true; return; }
-    const frag = document.createDocumentFragment();
-    arr.forEach((name,i)=>{
-      const li = document.createElement('li');
-      li.textContent = name;
-      li.dataset.index = i;
-      li.addEventListener('mousedown', e=>e.preventDefault());
-      li.addEventListener('click', ()=> { countryInput.value = name; dropdown.hidden = true; syncCountryToSelect(); compute(); });
-      frag.appendChild(li);
-    });
-    dropdown.appendChild(frag);
-    dropdown.hidden = false;
-    highlighted = -1;
-  };
-  const showMatches = q => {
-    const qn = normalize(q === undefined ? countryInput.value : q);
-    let res = [];
-    if (!qn) res = countries.slice(0, MAX_SHOW);
-    else {
-      const seen = new Set();
-      for (const c of countries){
-        const lc = c.toLowerCase();
-        if (lc.startsWith(qn) && !seen.has(lc)){ res.push(c); seen.add(lc); if (res.length>=MAX_SHOW) break; }
-      }
-      if (res.length < MAX_SHOW) for (const c of countries){
-        const lc = c.toLowerCase();
-        if (!seen.has(lc) && lc.includes(qn)){ res.push(c); seen.add(lc); if (res.length>=MAX_SHOW) break; }
-      }
-    }
-    items = res; render(res);
-  };
-  const debouncedShow = debounce(showMatches, 120);
-  countryInput.addEventListener('focus', ()=> showMatches());
-  countryInput.addEventListener('click', e=>{ e.stopPropagation(); showMatches(); });
-  countryInput.addEventListener('input', ()=> debouncedShow(countryInput.value));
-  countryInput.addEventListener('keydown', e=>{
-    if (dropdown.hidden) return;
-    const lis = dropdown.querySelectorAll('li');
-    if (!lis.length) return;
-    if (e.key === 'ArrowDown'){ e.preventDefault(); highlighted = Math.min(highlighted+1, lis.length-1); updateHighlight(lis);
-    } else if (e.key === 'ArrowUp'){ e.preventDefault(); highlighted = Math.max(highlighted-1, 0); updateHighlight(lis);
-    } else if (e.key === 'Enter'){ e.preventDefault(); const sel = lis[highlighted] || lis[0]; if (sel) { countryInput.value = sel.textContent; dropdown.hidden = true; syncCountryToSelect(); compute(); } 
-    } else if (e.key === 'Escape'){ dropdown.hidden = true; highlighted = -1; }
-  });
-  function updateHighlight(lis){ lis.forEach(li=>li.removeAttribute('aria-selected')); if (highlighted >= 0 && lis[highlighted]) { lis[highlighted].setAttribute('aria-selected','true'); lis[highlighted].scrollIntoView({block:'nearest'}); } }
-  document.addEventListener('click', e=>{ if (!e.target.closest(wrapper)) dropdown.hidden = true; });
-  window.addEventListener('resize', ()=>{ if (!dropdown.hidden) showMatches(); });
+  const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);if(isMobile)return;
+  const wrapper=countryInput.parentElement;wrapper.style.position=wrapper.style.position||'relative';
+  const dropdown=document.createElement('ul');dropdown.className='dropdown';dropdown.hidden=true;wrapper.appendChild(dropdown);
+  let items=[],highlighted=-1,MAX_SHOW=200;
+  const render=arr=>{dropdown.innerHTML='';if(!arr||!arr.length){dropdown.hidden=true;return;}const frag=document.createDocumentFragment();arr.forEach((name,i)=>{const li=document.createElement('li');li.textContent=name;li.dataset.index=i;li.addEventListener('mousedown',e=>e.preventDefault());li.addEventListener('click',()=>{countryInput.value=name;dropdown.hidden=true;syncCountryToSelect();compute();});frag.appendChild(li);});dropdown.appendChild(frag);dropdown.hidden=false;highlighted=-1;};
+  const showMatches=q=>{const qn=normalize(q===undefined?countryInput.value:q);let res=[];if(!qn)res=countries.slice(0,MAX_SHOW);else{const seen=new Set();for(const c of countries){const lc=c.toLowerCase();if(lc.startsWith(qn)&&!seen.has(lc)){res.push(c);seen.add(lc);if(res.length>=MAX_SHOW)break;}}if(res.length<MAX_SHOW)for(const c of countries){const lc=c.toLowerCase();if(!seen.has(lc)&&lc.includes(qn)){res.push(c);seen.add(lc);if(res.length>=MAX_SHOW)break;}}}items=res;render(res);};
+  const debouncedShow=debounce(showMatches,120);
+  countryInput.addEventListener('focus',()=>showMatches());
+  countryInput.addEventListener('click',e=>{e.stopPropagation();showMatches();});
+  countryInput.addEventListener('input',()=>debouncedShow(countryInput.value));
+  countryInput.addEventListener('keydown',e=>{if(dropdown.hidden)return;const lis=dropdown.querySelectorAll('li');if(!lis.length)return;if(e.key==='ArrowDown'){e.preventDefault();highlighted=Math.min(highlighted+1,lis.length-1);updateHighlight(lis);}else if(e.key==='ArrowUp'){e.preventDefault();highlighted=Math.max(highlighted-1,0);updateHighlight(lis);}else if(e.key==='Enter'){e.preventDefault();const sel=lis[highlighted]||lis[0];if(sel){countryInput.value=sel.textContent;dropdown.hidden=true;syncCountryToSelect();compute();}}else if(e.key==='Escape'){dropdown.hidden=true;highlighted=-1;}});
+  function updateHighlight(lis){lis.forEach(li=>li.removeAttribute('aria-selected'));if(highlighted>=0&&lis[highlighted]){lis[highlighted].setAttribute('aria-selected','true');lis[highlighted].scrollIntoView({block:'nearest'});}}
+  document.addEventListener('click',e=>{if(!e.target.closest(wrapper))dropdown.hidden=true;});
+  window.addEventListener('resize',()=>{if(!dropdown.hidden)showMatches();});
 })();
 
-/* Handle language change: apply UI translations and reload corresponding rates file */
-langSelect.addEventListener('change', async (e) => {
-  const lang = e.target.value;
-  applyTranslations(lang);
-  await loadRatesForLang(lang);
-});
+langSelect.addEventListener('change',async(e)=>{const lang=e.target.value;applyTranslations(lang);await loadRatesForLang(lang);});
 
-/* Init on DOMContentLoaded */
-document.addEventListener('DOMContentLoaded', ()=>{
-  const defaultLang = langSelect.value || 'uk';
-  applyTranslations(defaultLang);
-
-  if (window.matchMedia && window.matchMedia('(max-width:768px)').matches) {
-    countryInput.style.display = 'none';
-    document.getElementById('label-country').style.display = 'none';
-    countrySelect.style.display = 'block';
-    labelCountrySelect.style.display = 'block';
-  } else {
-    countrySelect.style.display = 'none';
-    labelCountrySelect.style.display = 'none';
-  }
-
-  loadRatesForLang(defaultLang);
-});
+document.addEventListener('DOMContentLoaded',()=>{const defaultLang=langSelect.value||'uk';applyTranslations(defaultLang);if(window.matchMedia&&window.matchMedia('(max-width:768px)').matches){countryInput.style.display='none';el('label-country').style.display='none';countrySelect.style.display='block';labelCountrySelect.style.display='block';}else{countrySelect.style.display='none';labelCountrySelect.style.display='none';}loadRatesForLang(defaultLang);});
 </script>
 </body>
 </html>
