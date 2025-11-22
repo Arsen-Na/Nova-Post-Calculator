@@ -8,9 +8,9 @@
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:16px;background:#f7f7f8;color:#111}
     .card{max-width:640px;margin:0 auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 6px 24px rgba(20,20,30,0.06)}
     h1{margin:0 0 12px;font-size:20px} label{display:block;margin-top:12px;font-weight:600}
-    input[type=number], select, .country-input{width:100%;box-sizing:border-box;padding:8px 10px;margin-top:6px;font-size:16px;border:1px solid #dcdde1;border-radius:6px;background:#fff}
+    input[type=number], select, .country-input{width:100%;box-sizing:border-box;padding:8px 10px;margin-top:6px;font-size:16px;border:1px solid #dcdde1;border-radius:8px;background:#fff;height:56px}
     .row{display:flex;gap:12px;flex-wrap:wrap}
-    .row>div{flex:1;min-width:120px;border:1.5px solid #e0e0e0;border-radius:8px;padding:12px 10px 4px;box-shadow:0 2px 8px rgba(20,20,30,0.03)}
+    .row>div{flex:1;min-width:120px;border:1.5px solid #e0e0e0;border-radius:8px;padding:12px 10px 4px;box-shadow:0 2px 8px rgba(20,20,30,0.03);display:flex;flex-direction:column;justify-content:center;min-height:84px}
     .result{margin-top:18px;padding:12px;background:#f0f8ff;border:1px solid #dbeefe;border-radius:6px}
     .formula{font-family:monospace;background:#f4f4f6;padding:6px;border-radius:6px;display:inline-block}
     .muted{color:#666;font-size:14px}.note{margin-top:8px;color:#444}
@@ -20,18 +20,22 @@
     .dropdown li:hover,.dropdown li[aria-selected="true"]{background:#f5f7fa}
     #countrySelect,label[for=countrySelect]{display:none}
     @media (max-width:768px){#countryInput,label[for=countryInput]{display:none}#countrySelect,label[for=countrySelect]{display:block}}
-    @media (max-width:600px){body{margin:8px}.card{padding:12px}h1{font-size:18px}input,select{font-size:14px}}
+    @media (max-width:600px){body{margin:8px}.card{padding:12px}h1{font-size:18px}input,select{font-size:14px;height:48px}}
     .lang-row{display:flex;justify-content:flex-end}.lang-select{width:170px}
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
-    .row>div{flex-direction:column;justify-content:center;gap:8px;min-height:84px;padding:12px 10px 4px}
     .after-country{margin-top:6px}
     .customs{margin-top:12px;padding:12px;background:#fff7f0;border:1px solid #f2d9c4;border-radius:6px;color:#111}
     .warning{margin-top:12px;padding:12px;background:#ffecec;border:1px solid #f5c2c2;border-radius:6px;color:#611}
     .warning a{color:#522;text-decoration:underline}
     .mode-row{margin:6px 0 12px}
-    .mode-toggle{display:flex;gap:8px;align-items:center}
-    .toggle-btn{padding:8px 12px;border-radius:999px;border:1px solid #dcdde1;background:#fff;cursor:pointer;font-weight:600}
-    .toggle-btn[aria-pressed="true"]{background:#0b76ff;color:#fff;border-color:#0b76ff}
+    .mode-block{display:flex;gap:12px;align-items:stretch}
+    .mode-cell{flex:1;border:1.5px solid #e0e0e0;border-radius:8px;overflow:hidden;min-height:84px;display:flex}
+    .mode-toggle{display:flex;width:100%}
+    .mode-btn{flex:1;border:0;background:#fff;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:16px;padding:0;height:100%;transition:background-color .18s ease,color .18s ease,box-shadow .18s ease}
+    .mode-btn + .mode-btn{border-left:1px solid rgba(0,0,0,0.06)}
+    .mode-btn:hover{background:rgba(0,0,0,0.04)}
+    .mode-btn:active{transform:translateY(1px)}
+    .mode-btn.active{background:#0b76ff;color:#fff;box-shadow:inset 0 -4px 12px rgba(0,0,0,0.06);filter:brightness(.95)}
+    .mode-btn:focus{outline:3px solid rgba(11,118,255,0.14);outline-offset:-3px}
   </style>
 </head>
 <body>
@@ -49,11 +53,11 @@
   <p class="muted" id="intro">Введіть розміри в сантиметрах та фактичну вагу в кілограмах.</p>
 
   <div class="mode-row" id="modeRow">
-    <div class="row" style="align-items:stretch">
-      <div style="flex:1">
+    <div class="mode-block" role="tablist" aria-label="Тип відправки">
+      <div class="mode-cell">
         <div class="mode-toggle" id="modeToggleWrap">
-          <button id="btnParcel" class="toggle-btn" aria-pressed="true">Посилка</button>
-          <button id="btnDocs" class="toggle-btn" aria-pressed="false">Документи</button>
+          <button id="btnParcel" class="mode-btn" aria-pressed="true" role="tab">Посилка</button>
+          <button id="btnDocs" class="mode-btn" aria-pressed="false" role="tab">Документи</button>
         </div>
       </div>
     </div>
@@ -122,9 +126,9 @@ const btnParcel=el('btnParcel'), btnDocs=el('btnDocs');
 const noticeLink='https://drive.google.com/file/d/1YHafkxkIv9wzWUNsmCvvVpN79mR9KZJe/view?usp=sharing';
 
 const T={
- uk:{langLabel:'Мова',title:'Калькулятор ціни',intro:"Введіть розміри в сантиметрах та фактичну вагу в кілограмах.",length:'Довжина (cm)',width:'Ширина (cm)',height:'Висота (cm)',weight:'Фактична вага (kg)',country:"Країна одержувача",mobilePlaceholder:'Вибери країну',formulaWords:{l:'довжина',w:'ширина',h:'висота'},formulaLabel:'Формула',volumetric:"Об'ємна вага:",billable:"Платна вага:",price:"Ціна:",unitKg:'kg',currency:'PLN',declaredLabel:'Оціночна вартість',declaredPlaceholder:'0',per10:'за 10 КГ',perExtra:'за кожен наступний КГ',insuranceText:'0.5% \"страхування\" від ОВ',andSeparator:', ',customsTitle:'Вартість митних платежів складе:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR або ${uah} UAH або ${pln} PLN`,presenceNotice:'Зверніть увагу, що доставка до даної країни відбувається партнером UPS авіа шляхом. Ознайомтесь із особливостями такої доставки у ',presenceLinkText:'1.1.3.21 СОК Перевірка відправлення на наявність забороненого вмісту з авіа-доставкою UPS',mode:{parcel:'Посилка',docs:'Документи'}},
- en:{langLabel:'Language',title:'Price calculator',intro:"Enter dimensions in centimetres and actual weight in kilograms.",length:'Length (cm)',width:'Width (cm)',height:'Height (cm)',weight:'Actual weight (kg)',country:"Destination country",mobilePlaceholder:'Choose country',formulaWords:{l:'length',w:'width',h:'height'},formulaLabel:'Formula',volumetric:"Volumetric weight:",billable:"Billable weight:",price:"Price:",unitKg:'kg',currency:'PLN',declaredLabel:'Estimated value',declaredPlaceholder:'0',per10:'for 10 KG',perExtra:'for each next KG',insuranceText:'0.5% \"insurance\" of EV',andSeparator:', ',customsTitle:'Customs payments will be:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR or ${uah} UAH or ${pln} PLN`,presenceNotice:'Please note that delivery to this country is provided by UPS partner via air. See specifics in ',presenceLinkText:'1.1.3.21 SOK Shipment check for prohibited content with UPS air delivery',mode:{parcel:'Parcel',docs:'Documents'}},
- pl:{langLabel:'Język',title:'Kalkulator ceny',intro:"Wprowadź wymiary w centymetrach i rzeczywistą wagę w kilogramach.",length:'Długość (cm)',width:'Szerokość (cm)',height:'Wysokość (cm)',weight:'Rzeczywista waga (kg)',country:"Kraj odbiorcy",mobilePlaceholder:'Wybierz kraj',formulaWords:{l:'długość',w:'szerokość',h:'wysokość'},formulaLabel:'Formuła',volumetric:"Waga objętościowa:",billable:"Waga obciążalna:",price:"Cena:",unitKg:'kg',currency:'PLN',declaredLabel:'Wartość szacunkowa',declaredPlaceholder:'0',per10:'za 10 KG',perExtra:'za każdy kolejny KG',insuranceText:'0.5% \"ubezpieczenie\" od WS',andSeparator:', ',customsTitle:'Koszty opłat celnych wyniosą:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR lub ${uah} UAH lub ${pln} PLN`,presenceNotice:'Zwróć uwagę, że dostawa do tego kraju odbywa się przez partnera UPS drogą lotniczą. Zapoznaj się ze szczegółami w ',presenceLinkText:'1.1.3.21 SOK Sprawdzenie przesyłki pod kątem zabronionej zawartości przy dostawie UPS (lotniczo)',mode:{parcel:'Paczka',docs:'Dokumenty'} }
+ uk:{langLabel:'Мова',title:'Калькулятор ціни',intro:"Введіть розміри в сантиметрах та фактичну вагу в кілограмах.",length:'Довжина (cm)',width:'Ширина (cm)',height:'Висота (cm)',weight:'Фактична вага (kg)',country:"Країна одержувача",mobilePlaceholder:'Вибери країну',formulaWords:{l:'довжина',w:'ширина',h:'висота'},formulaLabel:'Формула',volumetric:"Об'ємна вага:",billable:"Платна вага:",price:"Ціна:",unitKg:'kg',currency:'PLN',declaredLabel:'Оціночна вартість',declaredPlaceholder:'0',per10:'за 10 КГ',perExtra:'за кожен наступний КГ',insuranceText:'0.5% "страхування" від ОВ',andSeparator:', ',customsTitle:'Вартість митних платежів складе:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR або ${uah} UAH або ${pln} PLN`,presenceNotice:'Зверніть увагу, що доставка до даної країни відбувається партнером UPS авіа шляхом. Ознайомтесь із особливостями такої доставки у ',presenceLinkText:'1.1.3.21 СОК Перевірка відправлення на наявність забороненого вмісту з авіа-доставкою UPS',mode:{parcel:'Посилка',docs:'Документи'}},
+ en:{langLabel:'Language',title:'Price calculator',intro:"Enter dimensions in centimetres and actual weight in kilograms.",length:'Length (cm)',width:'Width (cm)',height:'Height (cm)',weight:'Actual weight (kg)',country:"Destination country",mobilePlaceholder:'Choose country',formulaWords:{l:'length',w:'width',h:'height'},formulaLabel:'Formula',volumetric:"Volumetric weight:",billable:"Billable weight:",price:"Price:",unitKg:'kg',currency:'PLN',declaredLabel:'Estimated value',declaredPlaceholder:'0',per10:'for 10 KG',perExtra:'for each next KG',insuranceText:'0.5% "insurance" of EV',andSeparator:', ',customsTitle:'Customs payments will be:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR or ${uah} UAH or ${pln} PLN`,presenceNotice:'Please note that delivery to this country is provided by UPS partner via air. See specifics in ',presenceLinkText:'1.1.3.21 SOK Shipment check for prohibited content with UPS air delivery',mode:{parcel:'Parcel',docs:'Documents'}},
+ pl:{langLabel:'Język',title:'Kalkulator ceny',intro:"Wprowadź wymiary w centymetrach i rzeczywistą wagę w kilogramach.",length:'Długość (cm)',width:'Szerokość (cm)',height:'Wysokość (cm)',weight:'Rzeczywista waga (kg)',country:"Kraj odbiorcy",mobilePlaceholder:'Wybierz kraj',formulaWords:{l:'długość',w:'szerokość',h:'wysokość'},formulaLabel:'Formuła',volumetric:"Waga objętościowa:",billable:"Waga obciążalna:",price:"Cena:",unitKg:'kg',currency:'PLN',declaredLabel:'Wartość szacunkowa',declaredPlaceholder:'0',per10:'za 10 KG',perExtra:'za każdy kolejny KG',insuranceText:'0.5% "ubezpieczenie" od WS',andSeparator:', ',customsTitle:'Koszty opłat celnych wyniosą:',customsDetailFmt:(eur,uah,pln)=>` ${eur} EUR lub ${uah} UAH lub ${pln} PLN`,presenceNotice:'Zwróć uwagę, że dostawa do tego kraju odbywa się przez partnera UPS drogą lotniczą. Zapoznaj się ze szczegółami w ',presenceLinkText:'1.1.3.21 SOK Sprawdzenie przesyłki pod kątem zabronionej zawartości przy dostawie UPS (lotniczo)',mode:{parcel:'Paczka',docs:'Dokumenty'} }
 };
 
 let countries=[],ratesMap={},aliasMap={};
@@ -137,7 +141,7 @@ const formatNumber=v=>((Math.round(v*100)/100).toFixed(2));
 const normalize=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
 
 let FX={EUR_PLN:null,EUR_UAH:null,lastFetched:0},FX_TTL=1000*60*30;
-async function fetchFxRates(){const now=Date.now();if(FX.lastFetched&&now-FX.lastFetched<FX_TTL&&FX.EUR_PLN&&FX.EUR_UAH)return FX;try{const res=await fetch('https://api.exchangerate.host/latest?base=EUR&symbols=PLN,UAH');if(!res.ok)throw 0;const data=await res.json();FX.EUR_PLN=data.rates.PLN;FX.EUR_UAH=data.rates.UAH;FX.lastFetched=Date.now();return FX;}catch(e){FX.EUR_PLN=FX.EUR_PLN||4.3;FX.EUR_UAH=FX.EUR_UAH||40;FX.lastFetched=Date.now();return FX;}}
+async function fetchFxRates(){const now=Date.now();if(FX.lastFetched&&now-FX.lastFetched<FX_TTL&&FX.EUR_PLN&&FX.EUR_UAH)return FX;try{const res=await fetch('https://api.exchangerate.host/latest?base=EUR&symbols=PLN,UAH');if(!res.ok)throw 0;const data=await res.json();FX.EUR_PLN=data.rates.PLN;FX.EUR_UAH=data.rates.UAH;FX.lastFetched=Date.now();return FX}catch(e){FX.EUR_PLN=FX.EUR_PLN||4.3;FX.EUR_UAH=FX.EUR_UAH||40;FX.lastFetched=Date.now();return FX}}
 
 function ratesFileForLang(lang){if(lang==='pl')return'./rates.json';if(lang==='uk')return'./rates-ua.json';if(lang==='en')return'./rates-eng.json';return'./rates.json';}
 
@@ -164,6 +168,7 @@ function applyTranslations(lang){
   btnParcel.textContent=t.mode.parcel; btnDocs.textContent=t.mode.docs;
   formulaRow.innerHTML=`${t.formulaLabel}: <span class="formula">(<span id="f-l">${t.formulaWords.l}</span> × <span id="f-w">${t.formulaWords.w}</span> × <span id="f-h">${t.formulaWords.h}</span>) ÷ 4000</span>`;
   fL=document.getElementById('f-l'); fW=document.getElementById('f-w'); fH=document.getElementById('f-h');
+  updateModeButtonVisuals();
 }
 
 async function loadPresenceCountries(){
@@ -218,18 +223,30 @@ function syncSelectToInput(){ if(countrySelect.value) countryInput.value = count
 
 let sendMode='parcel';
 
+function updateModeButtonVisuals(){
+  const activeClass='active';
+  if(btnParcel && btnDocs){
+    if(sendMode==='docs'){
+      btnDocs.classList.add(activeClass); btnDocs.setAttribute('aria-pressed','true');
+      btnParcel.classList.remove(activeClass); btnParcel.setAttribute('aria-pressed','false');
+    } else {
+      btnParcel.classList.add(activeClass); btnParcel.setAttribute('aria-pressed','true');
+      btnDocs.classList.remove(activeClass); btnDocs.setAttribute('aria-pressed','false');
+    }
+  }
+}
+
 function setMode(mode){
   sendMode=mode;
   const docsFixed={length:35,width:25,height:2,weight:1};
   if(mode==='docs'){
     lengthEl.value=docsFixed.length; widthEl.value=docsFixed.width; heightEl.value=docsFixed.height; weightEl.value=docsFixed.weight;
     [lengthEl,widthEl,heightEl,weightEl].forEach(i=>{i.readOnly=true;i.tabIndex=-1;i.setAttribute('aria-disabled','true');});
-    btnDocs.setAttribute('aria-pressed','true'); btnParcel.setAttribute('aria-pressed','false');
   }else{
     [lengthEl,widthEl,heightEl,weightEl].forEach(i=>{i.readOnly=false;i.removeAttribute('tabIndex');i.removeAttribute('aria-disabled');});
     lengthEl.value=''; widthEl.value=''; heightEl.value=''; weightEl.value='';
-    btnDocs.setAttribute('aria-pressed','false'); btnParcel.setAttribute('aria-pressed','true');
   }
+  updateModeButtonVisuals();
   compute();
 }
 
