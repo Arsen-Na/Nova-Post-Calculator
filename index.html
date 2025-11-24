@@ -10,7 +10,7 @@
 *{box-sizing:border-box}
 body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:16px;background:var(--bg);color:var(--text)}
 .card{max-width:640px;margin:0 auto;padding:20px;background:var(--card);border-radius:8px;box-shadow:var(--shadow)}
-h1{margin:0 0 12px;font-size:20px}label{display:block;margin-top:12px;font-weight:600;font-size:16px}
+h1{margin:0 0 12px;font-size:20px}label{display:block;margin-top:12px;font-weight:600}
 input[type=number],select,.country-input{width:100%;padding:8px 10px;margin-top:6px;font-size:16px;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);height:56px}
 .row{display:flex;gap:12px;flex-wrap:wrap}
 .row>div{flex:1;min-width:120px;border:1.5px solid rgba(0,0,0,0.04);border-radius:8px;padding:12px 10px 12px;display:flex;flex-direction:column;justify-content:center;min-height:84px;background:transparent;border-color:var(--border)}
@@ -23,7 +23,7 @@ input[type=number],select,.country-input{width:100%;padding:8px 10px;margin-top:
 .dropdown li:hover,.dropdown li[aria-selected="true"]{background:rgba(0,0,0,0.04)}
 #countrySelect,label[for=countrySelect]{display:none}
 @media (max-width:768px){#countryInput,label[for=countryInput]{display:none}#countrySelect,label[for=countrySelect]{display:block}}
-@media (max-width:600px){body{margin:8px}.card{padding:12px}h1{font-size:18px}input,select{font-size:14px;height:48px}label{font-size:14px}}
+@media (max-width:600px){body{margin:8px}.card{padding:12px}h1{font-size:18px}input,select{font-size:14px;height:48px}}
 .lang-row{display:flex;justify-content:flex-end;align-items:center;gap:12px}
 .lang-select{width:170px;height:40px;padding:6px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text)}
 .after-country{margin-top:6px}
@@ -49,13 +49,14 @@ input[type=number],select,.country-input{width:100%;padding:8px 10px;margin-top:
 .switch.on{background:linear-gradient(90deg,var(--accent),#3aa0ff);border-color:transparent}
 .switch.on .knob{transform:translate(24px,-50%)}
 .address-wrap{margin-top:12px;display:none;align-items:center;gap:10px;user-select:none}
-.address-wrap input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:22px;height:22px;min-width:22px;border-radius:6px;border:2px solid var(--border);background:transparent;position:relative;cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;display:inline-block;vertical-align:middle;box-sizing:border-box}
+.address-wrap label{font-weight:600;cursor:pointer}
+.address-wrap input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:20px;height:20px;min-width:20px;border-radius:6px;border:2px solid var(--border);background:transparent;position:relative;cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;display:inline-block;vertical-align:middle;box-sizing:border-box}
 .address-wrap input[type="checkbox"]::after{content:"";position:absolute;left:3px;top:3px;width:calc(100% - 6px);height:calc(100% - 6px);border-radius:4px;background:var(--accent);transform:scale(0);transform-origin:center;transition:transform .22s cubic-bezier(.2,.9,.3,1),opacity .18s;opacity:0;pointer-events:none}
 .address-wrap input[type="checkbox"]:checked{border-color:transparent}
 .address-wrap input[type="checkbox"]:checked::after{transform:scale(1);opacity:1}
 .address-wrap input[type="checkbox"]:focus{outline:3px solid rgba(11,118,255,0.14);outline-offset:2px;box-shadow:0 2px 8px rgba(11,118,255,0.06)}
-.address-wrap label{display:inline-flex;align-items:center;margin:0;line-height:1;font-weight:600;cursor:pointer;color:var(--text);font-size:16px}
-@media (max-width:600px){.address-wrap label{font-size:14px}.address-wrap input[type="checkbox"]{width:20px;height:20px;min-width:20px}}
+.address-wrap label{display:inline-flex;align-items:center;margin:0;line-height:1;font-weight:600;cursor:pointer;color:var(--text)}
+@media (max-width:600px){.address-wrap label{font-size:14px}.address-wrap input[type="checkbox"]{width:18px;height:18px;min-width:18px}}
 #presenceWarning{color:#712e2e}
 </style>
 </head>
@@ -378,6 +379,7 @@ function showWarning(t){ presenceWarning.style.display='block'; presenceWarning.
 function hideWarning(){ presenceWarning.style.display='none'; presenceWarning.innerHTML=''; }
 
 [lengthEl,widthEl,heightEl,weightEl,declaredEl].forEach(i=>i.addEventListener('input',debounce(()=>{const t=T[htmlEl.lang]||T.uk; if(fL) fL.textContent = lengthEl.value || t.formulaWords.l; if(fW) fW.textContent = widthEl.value || t.formulaWords.w; if(fH) fH.textContent = heightEl.value || t.formulaWords.h; compute();},120)));
+declaredEl.addEventListener('change',()=>compute());
 countryInput.addEventListener('input',debounce(()=>{syncCountryToSelect();compute();},120));
 countryInput.addEventListener('change',()=>{syncCountryToSelect();compute()});
 countrySelect.addEventListener('change',()=>{syncSelectToInput();compute()});
